@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd	
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+	">
+
+	<!-- 
+	
+	
+		Mock classes 
+		Note: this must appear before any objects that depend on them
+	
+	 -->
+	<bean id="helloService" class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg value="codesmell.hello.service.HelloService" />
+	</bean>
+
+	<!-- 
+	
+		SecurityContext.xml
+	
+	 -->
+
+	<!-- Used by the DelegatingFilterProxy -->
+	<security:http use-expressions="true" entry-point-ref="http401EntryPoint">
+		<security:intercept-url pattern="/login" access="permitAll()" />
+		<security:intercept-url pattern="/user" access="permitAll()" />
+		<security:intercept-url pattern="/**" access="isAuthenticated()" />
+		<security:form-login 
+			authentication-success-handler-ref="authSuccessHandler"
+    		authentication-failure-handler-ref="authFailureHandler"/>
+		<security:logout 
+			delete-cookies="JSESSIONID" 
+			invalidate-session="true"
+			success-handler-ref="logoutSuccessHandler"/>    		
+		<security:csrf disabled="true" />
+	</security:http>
+
+	<!-- 
+		eliminate default behavior to redirect 
+	 -->
+	<bean id="authSuccessHandler" class="codesmell.spring.security.NoRedirectAuthenticationSuccessHandler"/>
+	<bean id="authFailureHandler" class="codesmell.spring.security.NoRedirectAuthenticationFailureHandler"/>
+	<bean id="logoutSuccessHandler" class="org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler"/>
+
+	<!-- 
+		when user accesses REST without authentication these handle the response
+	 -->
+	<bean id="http403EntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
+	<bean id="http401EntryPoint" class="codesmell.spring.security.Http401UnauthorizedEntryPoint" />
+
+	<!-- authentication manager -->
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="inMemoryAuth"/> 
+	</security:authentication-manager>
+
+	<!-- in-memory authentication -->
+	<security:user-service id="inMemoryAuth">
+		<security:user name="mikeb" password="password" authorities="ROLE_USER" />
+	</security:user-service>
+
+
+
+	<!-- 
+	
+		ApplicationContext.xml
+	
+	 -->
+
+	<!-- Where to look for annotated components -->
+	<context:component-scan base-package="codesmell" />
+ 
+ 	<!-- serve static resources under the web root using Container Default Servlet -->
+	<mvc:default-servlet-handler/>
+	
+	<!-- serve static resources without going through DispatcherServlet/controllers -->
+	<mvc:resources mapping="/ui/**" location="/ui/**,/WEB-INF/,/" cache-period="360000000" />
+	
+	<!-- REST Controllers -->	
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter" />
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				<property name="prettyPrint" value="true" />				
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+		
+</beans>

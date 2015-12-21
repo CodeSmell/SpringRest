@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd	
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	">
+
+	<!-- Where to look for annotated components -->
+	<context:component-scan base-package="codesmell" />
+ 
+ 	<!-- serve static resources under the web root using Container Default Servlet -->
+	<mvc:default-servlet-handler/>
+	
+	<!-- serve static resources without going through DispatcherServlet/controllers -->
+	<mvc:resources mapping="/ui/**" location="/ui/**,/WEB-INF/,/" cache-period="360000000" />
+	
+	<!-- REST Controllers -->	
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter" />
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				<property name="prettyPrint" value="true" />				
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+		
+</beans>
