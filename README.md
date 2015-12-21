@@ -1,2 +1,3 @@
 # SpringRest
-Simple Spring REST with Security
+Simple Spring REST Application with Security and unit tests
+
