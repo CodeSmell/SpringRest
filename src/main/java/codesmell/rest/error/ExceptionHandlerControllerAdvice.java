@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,6 +31,13 @@ public class ExceptionHandlerControllerAdvice {
     @ResponseBody
 	public List<ErrorHolder> invalidJson() {
 		return this.createErrorResponse("missing or invalid JSON");
+	}
+	
+	@ExceptionHandler(value=HttpMediaTypeNotSupportedException.class)
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    @ResponseBody
+	public List<ErrorHolder> invalidContentType() {
+		return this.createErrorResponse("Unknown Content-Type");
 	}
 	
     @ExceptionHandler(value = NoDataFoundException.class)
