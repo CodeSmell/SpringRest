@@ -2,10 +2,15 @@ package codesmell.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ReflectionUtil {
+public final class ReflectionUtil {
+	
+	private ReflectionUtil(){
+	}
+	
 	public static void doInjectWithNoContainer(Object bean, Class<?> injectClass, Object injectObj){ 
 		try {
 			Field[] fields = bean.getClass().getDeclaredFields();
@@ -41,5 +46,12 @@ public class ReflectionUtil {
 		catch(Exception e){
 			throw new RuntimeException(e.getMessage(),e);
 		}
+	}
+	
+	public static <T> T callMethod(Object obj, String methodName, Class[] paramTypes, Object[] paramValues, Class<T> returnType) throws Exception{
+		Method m = obj.getClass().getDeclaredMethod(methodName, paramTypes);
+		m.setAccessible(true);
+		Object rtnObj = m.invoke(obj, paramValues);
+		return returnType.cast(rtnObj);
 	}
 }

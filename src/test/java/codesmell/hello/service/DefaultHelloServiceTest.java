@@ -263,6 +263,21 @@ public class DefaultHelloServiceTest {
 
 	}
 
+	@Test
+	public void test_get_hello_reflect() throws Exception{
+		String helloId = "2112";
+		
+		Mockito.when(mockDao.selectHello(helloId)).thenReturn(new Hello(helloId, "mike"));
+		
+		// just testing Reflection Utils
+		Hello hello = ReflectionUtil.callMethod(svc, "retrieveHello", new Class[]{String.class}, new Object[]{helloId}, Hello.class);
+		
+		assertNotNull(hello);
+		assertEquals("2112", hello.getHelloId());
+		assertEquals("mike", hello.getHelloName());
+		
+		Mockito.reset(mockDao);
+	}
 	
 	public static List<Hello> getHelloList(){
 		List<Hello> list = new ArrayList<Hello>();
