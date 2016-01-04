@@ -18,7 +18,7 @@ public final class ReflectionUtil {
 			for (Field f : fields) {
 				Annotation inject = f.getAnnotation(Autowired.class);
 				Class<?> fieldClass = f.getType();
-				if ((inject != null) && (injectClass == fieldClass)){				
+				if ((inject != null) && (injectClass.equals(fieldClass))){				
 					f.setAccessible(true);
 					f.set(bean, injectObj);
 					f.setAccessible(false);
@@ -36,7 +36,7 @@ public final class ReflectionUtil {
 	
 			if (f !=null){
 				Class<?> fieldClass = f.getType();
-				if (injectClass == fieldClass){				
+				if ((injectClass != null) && (injectClass.equals(fieldClass))){			
 					f.setAccessible(true);
 					f.set(bean, injectObj);
 					f.setAccessible(false);
